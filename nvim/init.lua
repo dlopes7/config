@@ -9,26 +9,62 @@ vim.keymap.set("n", "<leader>q", ":quit<CR>")
 vim.keymap.set("n", "<leader>d", ":t.<CR>")
 vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
 
-vim.pack.add{
-  -- lsp
-  {src = "https://github.com/neovim/nvim-lspconfig"},
-  {src = "https://github.com/mason-org/mason.nvim"},
-  {src = "https://github.com/mason-org/mason-lspconfig.nvim"},
+vim.pack.add {
+	-- lsp
+	{ src = "https://github.com/neovim/nvim-lspconfig" },
+	{ src = "https://github.com/mason-org/mason.nvim" },
+	{ src = "https://github.com/mason-org/mason-lspconfig.nvim" },
 
-  -- picker
-  {src = "https://github.com/nvim-mini/mini.pick"},
+	-- picker
+	{ src = "https://github.com/nvim-mini/mini.pick" },
 
-   -- telescope
-  {src = "https://github.com/nvim-telescope/telescope.nvim"},
-  {src = "https://github.com/nvim-lua/plenary.nvim"},
-  {src = "https://github.com/nvim-telescope/telescope-file-browser.nvim"}
+	-- telescope
+	{ src = "https://github.com/nvim-telescope/telescope.nvim" },
+	{ src = "https://github.com/nvim-lua/plenary.nvim" },
+	{ src = "https://github.com/nvim-telescope/telescope-file-browser.nvim" },
+
+	-- theme
+	{ src = "https://github.com/folke/tokyonight.nvim" }
 }
 
 require("mason").setup()
-require("mason-lspconfig").setup{
-   ensure_installed = {"lua_ls", "pyright"},
+require("mason-lspconfig").setup {
+	ensure_installed = { "lua_ls", "pyright" },
 }
 
 require("mini.pick").setup()
 require("telescope").setup()
 require("telescope").load_extension "file_browser"
+
+
+vim.cmd [[colorscheme tokyonight-night]]
+
+-- autocomplete and lint
+vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('my.lsp', {}),
+	callback = function(args)
+		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+
+		-- Enable auto-completion. Note: Use CTRL-Y to select an item. |complete_CTRL-Y|
+		if client:supports_method('textDocument/completion') then
+			-- Optional: trigger autocompletion on EVERY keypress. May be slow!
+			-- local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
+			-- client.server_capabilities.completionProvider.triggerCharacters = chars
+
+			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+		end
+
+		-- Auto-format ("lint") on save.
+		-- Usually not needed if server supports "textDocument/willSaveWaitUntil".
+		if not client:supports_method('textDocument/willSaveWaitUntil')
+		    and client:supports_method('textDocument/formatting') then
+			vim.api.nvim_create_autocmd('BufWritePre', {
+				group = vim.api.nvim_create_augroup('my.lsp', { clear = false }),
+				buffer = args.buf,
+				callback = function()
+					vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
+				end,
+			})
+		end
+	end,
+})
