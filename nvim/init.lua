@@ -3,11 +3,12 @@ vim.o.relativenumber = true
 vim.o.wrap = false
 vim.o.tabstop = 4
 vim.g.mapleader = " "
+vim.o.winborder = "rounded"
 
 vim.keymap.set("n", "<leader>w", ":write<CR>")
 vim.keymap.set("n", "<leader>q", ":quit<CR>")
 vim.keymap.set("n", "<leader>d", ":t.<CR>")
-vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
+vim.keymap.set("n", "<leader>f", ":Telescope fd<CR>")
 
 vim.pack.add {
 	-- lsp
@@ -29,7 +30,7 @@ vim.pack.add {
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-	ensure_installed = { "lua_ls", "pyright" },
+	ensure_installed = { "lua_ls", "ruff", "ts_ls", "eslint" },
 }
 
 require("mini.pick").setup()
