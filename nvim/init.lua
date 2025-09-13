@@ -9,6 +9,8 @@ vim.keymap.set("n", "<leader>w", ":write<CR>")
 vim.keymap.set("n", "<leader>q", ":quit<CR>")
 vim.keymap.set("n", "<leader>d", ":t.<CR>")
 vim.keymap.set("n", "<leader>f", ":Telescope fd<CR>")
+vim.keymap.set("n", "<leader>gr", ":Telescope lsp_references<CR>")
+vim.keymap.set("n", "<leader>gd", ":Telescope lsp_definitions<CR>")
 
 vim.pack.add {
 	-- lsp
@@ -25,18 +27,19 @@ vim.pack.add {
 	{ src = "https://github.com/nvim-telescope/telescope-file-browser.nvim" },
 
 	-- theme
-	{ src = "https://github.com/folke/tokyonight.nvim" }
+	{ src = "https://github.com/folke/tokyonight.nvim" },
+	{ src = "https://github.com/stevearc/oil.nvim" }
 }
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-	ensure_installed = { "lua_ls", "ruff", "ts_ls", "eslint" },
+	ensure_installed = { "lua_ls", "ruff", "ts_ls", "eslint", "gopls" },
 }
 
 require("mini.pick").setup()
 require("telescope").setup()
 require("telescope").load_extension "file_browser"
-
+require("oil").setup()
 
 vim.cmd [[colorscheme tokyonight-night]]
 
@@ -45,15 +48,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('my.lsp', {}),
 	callback = function(args)
 		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-		-- Enable auto-completion. Note: Use CTRL-Y to select an item. |complete_CTRL-Y|
-		if client:supports_method('textDocument/completion') then
-			-- Optional: trigger autocompletion on EVERY keypress. May be slow!
-			-- local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
-			-- client.server_capabilities.completionProvider.triggerCharacters = chars
-
-			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-		end
 
 		-- Auto-format ("lint") on save.
 		-- Usually not needed if server supports "textDocument/willSaveWaitUntil".
@@ -68,4 +62,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 			})
 		end
 	end,
+})
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+	pattern = { '*.tsx', '*.ts', '*.cts', '*.jsx', '*.js', '*.cjs' },
+	command = 'LspEslintFixAll',
+	group = vim.api.nvim_create_augroup('EslintAutoFormat', {})
 })
