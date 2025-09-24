@@ -2,8 +2,11 @@ vim.o.number = true
 vim.o.relativenumber = true
 vim.o.wrap = false
 vim.o.tabstop = 4
+vim.o.expandtab = true
 vim.g.mapleader = " "
 vim.o.winborder = "rounded"
+vim.o.shiftwidth = 4
+vim.o.softtabstop = 4
 
 vim.keymap.set("n", "<leader>w", ":write<CR>")
 vim.keymap.set("n", "<leader>q", ":quit<CR>")
@@ -11,6 +14,10 @@ vim.keymap.set("n", "<leader>d", ":t.<CR>")
 vim.keymap.set("n", "<leader>f", ":Telescope fd<CR>")
 vim.keymap.set("n", "<leader>gr", ":Telescope lsp_references<CR>")
 vim.keymap.set("n", "<leader>gd", ":Telescope lsp_definitions<CR>")
+vim.keymap.set("n", "<leader>p", ":Pick grep pattern<CR>")
+vim.keymap.set("n", "<leader>cc", ":ClaudeCode<CR>")
+vim.keymap.set("n", "<leader>t", ":split | terminal<CR>")
+vim.keymap.set("i", "<C-Space>", function() return require('mini.completion').trigger() end)
 
 vim.pack.add {
 	-- lsp
@@ -28,7 +35,11 @@ vim.pack.add {
 	{ src = "https://github.com/stevearc/oil.nvim" },
 
 	-- Niceties
-	{ src = "https://github.com/nvim-mini/mini.nvim" }
+	{ src = "https://github.com/nvim-mini/mini.nvim" },
+
+    -- AI
+    { src = "https://github.com/greggh/claude-code.nvim"}
+
 }
 
 require("mason").setup()
@@ -42,29 +53,10 @@ require("oil").setup()
 require("mini.pick").setup()
 require("mini.comment").setup()
 require("mini.completion").setup()
+require("claude-code").setup()
 
 vim.cmd [[colorscheme tokyonight-night]]
 
--- autocomplete and lint
-vim.api.nvim_create_autocmd('LspAttach', {
-	group = vim.api.nvim_create_augroup('my.lsp', {}),
-	callback = function(args)
-		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-		-- Auto-format ("lint") on save.
-		-- Usually not needed if server supports "textDocument/willSaveWaitUntil".
-		if not client:supports_method('textDocument/willSaveWaitUntil')
-		    and client:supports_method('textDocument/formatting') then
-			vim.api.nvim_create_autocmd('BufWritePre', {
-				group = vim.api.nvim_create_augroup('my.lsp', { clear = false }),
-				buffer = args.buf,
-				callback = function()
-					vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
-				end,
-			})
-		end
-	end,
-})
 
 vim.api.nvim_create_autocmd('BufWritePre', {
 	pattern = { '*.tsx', '*.ts', '*.cts', '*.jsx', '*.js', '*.cjs' },

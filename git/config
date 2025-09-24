@@ -8,8 +8,8 @@
 [init]
 	defaultBranch = master
 [user]
-	name = dlopes7
-	email = davidribeirolopes@gmail.com
+	name = David Lopes
+	email = david.lopes@dynatrace.com
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
@@ -18,3 +18,7 @@
 	helper = !/usr/bin/gh auth git-credential
 [http "https://bitbucket.lab.dynatrace.org"]
 	proxy = http://100.106.81.113:3128
+[push]
+	autoSetupRemote = true
+[core]
+	longpaths = true
