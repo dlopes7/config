@@ -17,7 +17,6 @@ vim.keymap.set("n", "<leader>gd", ":Telescope lsp_definitions<CR>")
 vim.keymap.set("n", "<leader>p", ":Pick grep pattern<CR>")
 vim.keymap.set("n", "<leader>cc", ":ClaudeCode<CR>")
 vim.keymap.set("n", "<leader>t", ":split | terminal<CR>")
-vim.keymap.set("i", "<C-Space>", function() return require('mini.completion').trigger() end)
 
 vim.pack.add {
 	-- lsp
@@ -44,7 +43,7 @@ vim.pack.add {
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-	ensure_installed = { "lua_ls", "ruff", "ts_ls", "eslint", "gopls", "pyright" },
+	ensure_installed = { "lua_ls", "ruff", "ts_ls", "eslint", "gopls", "pyright", "jsonls", "yamlls" },
 }
 
 require("telescope").setup()
