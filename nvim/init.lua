@@ -17,6 +17,7 @@ vim.keymap.set("n", "<leader>gd", ":Telescope lsp_definitions<CR>")
 vim.keymap.set("n", "<leader>p", ":Pick grep pattern<CR>")
 vim.keymap.set("n", "<leader>cc", ":ClaudeCode<CR>")
 vim.keymap.set("n", "<leader>t", ":split | terminal<CR>")
+vim.keymap.set("n", "<leader>o", ":Oil<CR>")
 
 vim.pack.add {
 	-- lsp
